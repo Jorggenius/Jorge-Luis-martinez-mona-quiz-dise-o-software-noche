@@ -244,6 +244,7 @@ public class VistaCrud extends javax.swing.JFrame {
         int id = Integer.parseInt(txtId.getText());
         try {
             controlC.delete(id);
+            llenarTabla();
             JOptionPane.showMessageDialog(null, "La moto ha sido eliminado");
 //            motos = controlC.getMotos();
         } catch (SQLException ex) {
@@ -269,6 +270,7 @@ public class VistaCrud extends javax.swing.JFrame {
         String color = txtColor.getText();
         try {
             controlC.upDate(id, marca, cilindraje, precio, color);
+            llenarTabla();
             JOptionPane.showMessageDialog(null, "La moto ha sido actualizada");
 //            motos = controlC.getMotos();
         } catch (SQLException ex) {
@@ -278,13 +280,13 @@ public class VistaCrud extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnEditarActionPerformed
 
-    private void llenarTabla() {
+    private void llenarTabla() throws SQLException {
         DefaultTableModel model = new DefaultTableModel(new String[]{"Id", "Marca", "Cilindraje", "Precio", "Color"},
-                controlC.getMotos().size());
+                controlC.motosSql().size());
         tablaMotos.setModel(model);
         TableModel modelP = tablaMotos.getModel();
-        for (int i = 0; i < controlC.getMotos().size(); i++) {
-            Moto moto = controlC.getMotos().get(i);
+        for (int i = 0; i < controlC.motosSql().size(); i++) {
+            Moto moto = controlC.motosSql().get(i);
             modelP.setValueAt(moto.getId(), i, 0);
             modelP.setValueAt(moto.getMarca(), i, 1);
             modelP.setValueAt(moto.getCilindraje(), i, 2);
