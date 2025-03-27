@@ -4,18 +4,39 @@
  */
 package vista;
 
+import control.ControlVistaCrud;
+import exception.InvalidUserDataException;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+import modelo.Moto;
+
 /**
  *
  * @author JORGE
  */
 public class VistaCrud extends javax.swing.JFrame {
 
+    ControlVistaCrud controlC;
+//    ArrayList<Moto> motos;
+
     /**
      * Creates new form VistaCrud
      */
-    public VistaCrud() {
+    public VistaCrud() throws SQLException {
         initComponents();
         setLocationRelativeTo(this);
+        controlC = new ControlVistaCrud();
+//        motos = controlC.getMotos();
+        llenarTabla();
+        agregarListenerTabla();
     }
 
     /**
@@ -30,7 +51,7 @@ public class VistaCrud extends javax.swing.JFrame {
         jLabel4 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        tablaMotos = new javax.swing.JTable();
         jLabel1 = new javax.swing.JLabel();
         txtMarca = new javax.swing.JTextField();
         txtCilindraje = new javax.swing.JTextField();
@@ -46,6 +67,7 @@ public class VistaCrud extends javax.swing.JFrame {
         btnEliminar = new javax.swing.JButton();
         txtId = new javax.swing.JTextField();
         jLabel8 = new javax.swing.JLabel();
+        btnRegresar = new javax.swing.JButton();
 
         jLabel4.setText("jLabel4");
 
@@ -53,7 +75,7 @@ public class VistaCrud extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        tablaMotos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null, null},
                 {null, null, null, null, null},
@@ -64,7 +86,7 @@ public class VistaCrud extends javax.swing.JFrame {
                 "id", "Marca", "Cilindraje", "Precio", "Color"
             }
         ));
-        jScrollPane1.setViewportView(jTable1);
+        jScrollPane1.setViewportView(tablaMotos);
 
         jLabel1.setText("CRUD");
 
@@ -77,14 +99,36 @@ public class VistaCrud extends javax.swing.JFrame {
         jLabel7.setText("Color");
 
         btnAgregar.setText("agregar");
+        btnAgregar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAgregarActionPerformed(evt);
+            }
+        });
 
         btnBuscar.setText("buscar");
 
         btnEditar.setText("editar");
+        btnEditar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEditarActionPerformed(evt);
+            }
+        });
 
         btnEliminar.setText("eliminar");
+        btnEliminar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEliminarActionPerformed(evt);
+            }
+        });
 
         jLabel8.setText("Id");
+
+        btnRegresar.setText("Regresar");
+        btnRegresar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRegresarActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -95,14 +139,6 @@ public class VistaCrud extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(54, 54, 54)
-                        .addComponent(jLabel8)
-                        .addGap(18, 18, 18)
-                        .addComponent(txtId, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(jLabel1)
-                        .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(24, 24, 24)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -120,18 +156,30 @@ public class VistaCrud extends javax.swing.JFrame {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(txtPrecio, javax.swing.GroupLayout.DEFAULT_SIZE, 72, Short.MAX_VALUE)
                             .addComponent(txtColor))
-                        .addGap(76, 76, 76)))
+                        .addGap(76, 76, 76))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(54, 54, 54)
+                                .addComponent(jLabel8)
+                                .addGap(18, 18, 18)
+                                .addComponent(txtId, javax.swing.GroupLayout.PREFERRED_SIZE, 76, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(jLabel1))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(35, 35, 35)
+                                .addComponent(btnAgregar)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(btnBuscar)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(btnEditar)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(btnEliminar))
+                            .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(btnRegresar)))
+                        .addGap(0, 35, Short.MAX_VALUE)))
                 .addContainerGap())
-            .addGroup(layout.createSequentialGroup()
-                .addGap(35, 35, 35)
-                .addComponent(btnAgregar)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btnBuscar)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btnEditar)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(btnEliminar)
-                .addContainerGap(41, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -159,7 +207,9 @@ public class VistaCrud extends javax.swing.JFrame {
                     .addComponent(btnBuscar)
                     .addComponent(btnEditar)
                     .addComponent(btnEliminar))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 35, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(btnRegresar)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -167,16 +217,108 @@ public class VistaCrud extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void btnAgregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarActionPerformed
+        // TODO add your handling code here:
+        try {
+            String marca = txtMarca.getText();
+            int cilindraje = Integer.parseInt(txtCilindraje.getText());
+            int precio = Integer.parseInt(txtPrecio.getText());
+            String color = txtColor.getText();
+            Moto moto = new Moto(marca, cilindraje, precio, color);
+            controlC.createMoto(moto);
+            JOptionPane.showMessageDialog(null, "la moto ha sido registrada");
+//            motos = controlC.getMotos();
+            llenarTabla();
+            
+        } catch (SQLException ex) {
+            Logger.getLogger(VistaCrud.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InvalidUserDataException ex) {
+            Logger.getLogger(VistaCrud.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }//GEN-LAST:event_btnAgregarActionPerformed
+
+    private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
+        // TODO add your handling code here:
+        
+        int id = Integer.parseInt(txtId.getText());
+        try {
+            controlC.delete(id);
+            JOptionPane.showMessageDialog(null, "La moto ha sido eliminado");
+//            motos = controlC.getMotos();
+        } catch (SQLException ex) {
+            Logger.getLogger(VistaCrud.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        
+    }//GEN-LAST:event_btnEliminarActionPerformed
+
+    private void btnRegresarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegresarActionPerformed
+        // TODO add your handling code here:
+        vistaLogin vistaL = new vistaLogin();
+        vistaL.setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_btnRegresarActionPerformed
+
+    private void btnEditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarActionPerformed
+        // TODO add your handling code here:
+        int id = Integer.parseInt(txtId.getText());
+        String marca = txtMarca.getText();
+        int cilindraje = Integer.parseInt(txtCilindraje.getText());
+        int precio = Integer.parseInt(txtPrecio.getText());
+        String color = txtColor.getText();
+        try {
+            controlC.upDate(id, marca, cilindraje, precio, color);
+            JOptionPane.showMessageDialog(null, "La moto ha sido actualizada");
+//            motos = controlC.getMotos();
+        } catch (SQLException ex) {
+            Logger.getLogger(VistaCrud.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InvalidUserDataException ex) {
+            Logger.getLogger(VistaCrud.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_btnEditarActionPerformed
+
+    private void llenarTabla() {
+        DefaultTableModel model = new DefaultTableModel(new String[]{"Id", "Marca", "Cilindraje", "Precio", "Color"},
+                controlC.getMotos().size());
+        tablaMotos.setModel(model);
+        TableModel modelP = tablaMotos.getModel();
+        for (int i = 0; i < controlC.getMotos().size(); i++) {
+            Moto moto = controlC.getMotos().get(i);
+            modelP.setValueAt(moto.getId(), i, 0);
+            modelP.setValueAt(moto.getMarca(), i, 1);
+            modelP.setValueAt(moto.getCilindraje(), i, 2);
+            modelP.setValueAt(moto.getPrecio(), i, 3);
+            modelP.setValueAt(moto.getColor(), i, 4);
+        }
+    }
+    
+        private void agregarListenerTabla() {
+        ListSelectionModel model = tablaMotos.getSelectionModel();
+        model.addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                if (!e.getValueIsAdjusting()) {
+                    int selectedRow = tablaMotos.getSelectedRow();
+                    if (selectedRow != -1) {
+                        // Obtén el valor de la columna "№ Plaza"
+                        String id = String.valueOf( tablaMotos.getValueAt(selectedRow, 0));
+                        txtId.setText(id);
+                    }
+                }
+            }
+        });
+    }
     /**
      * @param args the command line arguments
      */
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAgregar;
     private javax.swing.JButton btnBuscar;
     private javax.swing.JButton btnEditar;
     private javax.swing.JButton btnEliminar;
+    private javax.swing.JButton btnRegresar;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -186,7 +328,7 @@ public class VistaCrud extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
+    private javax.swing.JTable tablaMotos;
     private javax.swing.JTextField txtCilindraje;
     private javax.swing.JTextField txtColor;
     private javax.swing.JTextField txtId;
