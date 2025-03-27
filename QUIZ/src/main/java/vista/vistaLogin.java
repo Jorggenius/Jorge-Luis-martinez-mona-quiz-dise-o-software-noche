@@ -5,6 +5,9 @@
 package vista;
 
 import control.ControlVistaLogin;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 /**
@@ -123,10 +126,14 @@ public class vistaLogin extends javax.swing.JFrame {
         String nombre = txtNombre.getText();
         String contraseña = txtContraseña.getText();
         if(controlVL.login(nombre, contraseña)){
-            VistaCrud vistC = new VistaCrud();
-            vistC.setVisible(true);
-            this.dispose();
-            JOptionPane.showMessageDialog(null, "Ingreso exitoso");
+            try {
+                VistaCrud vistC = new VistaCrud();
+                vistC.setVisible(true);
+                this.dispose();
+                JOptionPane.showMessageDialog(null, "Ingreso exitoso");
+            } catch (SQLException ex) {
+                Logger.getLogger(vistaLogin.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }else{
             JOptionPane.showMessageDialog(null, "Ingreso Denegado");
         }        
